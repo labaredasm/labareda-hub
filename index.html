@@ -2426,5 +2426,30 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeModal();
 });
 </script>
+   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<script>
+const supabase = supabase.createClient(
+  https://nwlseelsnjsfdjdpaaqf.supabase.co/rest/v1/
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53bHNlZWxzbmpzZmRqZHBhYXFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0ODUyMjksImV4cCI6MjA5MzA2MTIyOX0.lKBBf6FMZZFuKYetdW8i05QEArmQ4Rfrxud_z-JNv8E
+);
+
+document.querySelector('form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const nome = document.querySelector('#nome').value;
+  const email = document.querySelector('#email').value;
+
+  const { error } = await supabase
+    .from('leads')
+    .insert([{ nome, email }]);
+
+  if (error) {
+    alert('Erro ao enviar');
+  } else {
+    alert('Enviado com sucesso!');
+  }
+});
+</script>
 </body>
 </html>
