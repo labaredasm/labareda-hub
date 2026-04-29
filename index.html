@@ -1,0 +1,2430 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Labareda Hub</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   LABAREDA HUB — CSS BASE + TEMAS
+   ============================================================ */
+:root {
+  --bg:        #0d0d0d;
+  --bg2:       #141414;
+  --bg3:       #1a1a1a;
+  --border:    #2a2a2a;
+  --text:      #e8e8e8;
+  --text2:     #888;
+  --text3:     #555;
+  --accent:    #f97316;
+  --accent2:   #ea580c;
+  --green:     #22c55e;
+  --yellow:    #eab308;
+  --red:       #ef4444;
+  --blue:      #3b82f6;
+  --purple:    #a855f7;
+  --sidebar:   200px;
+  --radius:    10px;
+  --font:      'DM Sans', sans-serif;
+  --mono:      'DM Mono', monospace;
+}
+
+/* TEMA CLEAN */
+[data-theme="clean"] {
+  --bg:     #f5f5f4;
+  --bg2:    #ffffff;
+  --bg3:    #e7e5e4;
+  --border: #d6d3d1;
+  --text:   #1c1917;
+  --text2:  #78716c;
+  --text3:  #a8a29e;
+}
+
+/* TEMA COR */
+[data-theme="color"] {
+  --bg:     #1a0a00;
+  --bg2:    #220e00;
+  --bg3:    #2d1400;
+  --border: #4a2000;
+  --text:   #fff7ed;
+  --text2:  #fb923c;
+  --text3:  #c2410c;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* ============================================================
+   LOGIN
+   ============================================================ */
+#login-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  background-image: radial-gradient(ellipse at 20% 50%, rgba(249,115,22,0.08) 0%, transparent 60%),
+                    radial-gradient(ellipse at 80% 20%, rgba(249,115,22,0.05) 0%, transparent 50%);
+}
+
+.login-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 48px 40px;
+  width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+}
+
+.login-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.login-logo svg { width: 48px; height: 48px; }
+
+.login-logo h1 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.login-logo span {
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-family: var(--mono);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+.login-field label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text2);
+  margin-bottom: 6px;
+}
+
+.login-field input {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 11px 14px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.login-field input:focus { border-color: var(--accent); }
+
+.btn-primary {
+  width: 100%;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 12px;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  margin-top: 4px;
+}
+
+.btn-primary:hover { background: var(--accent2); }
+.btn-primary:active { transform: scale(0.98); }
+
+.login-error {
+  color: var(--red);
+  font-size: 12px;
+  text-align: center;
+  min-height: 16px;
+}
+
+/* ============================================================
+   APP LAYOUT
+   ============================================================ */
+#app { display: none; }
+
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: var(--sidebar);
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 100;
+}
+
+.sidebar-logo {
+  padding: 20px 16px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-logo svg { width: 28px; height: 28px; flex-shrink: 0; }
+.sidebar-logo span { font-size: 14px; font-weight: 700; letter-spacing: -0.3px; }
+
+.sidebar-section {
+  padding: 16px 10px 6px;
+}
+
+.sidebar-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text3);
+  padding: 0 6px;
+  margin-bottom: 4px;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  transition: all 0.15s;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.active { background: rgba(249,115,22,0.12); color: var(--accent); }
+.nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 12px 10px;
+  border-top: 1px solid var(--border);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--bg3);
+}
+
+.user-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.user-details { min-width: 0; }
+.user-name { font-size: 12px; font-weight: 600; }
+.user-role { font-size: 10px; color: var(--text3); }
+
+.btn-logout {
+  margin-top: 8px;
+  width: 100%;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px;
+  color: var(--text2);
+  font-size: 12px;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-logout:hover { border-color: var(--red); color: var(--red); }
+
+/* MAIN CONTENT */
+.main-content {
+  margin-left: var(--sidebar);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* TOPBAR */
+.topbar {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.topbar-left { display: flex; flex-direction: column; gap: 2px; }
+.topbar-title { font-size: 16px; font-weight: 700; }
+.topbar-subtitle { font-size: 11px; color: var(--text3); }
+
+.theme-switcher {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.theme-btn {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all 0.15s;
+}
+
+.theme-btn:hover, .theme-btn.active { border-color: var(--accent); background: rgba(249,115,22,0.1); }
+
+/* PÁGINA */
+.page { display: none; padding: 24px; }
+.page.active { display: block; }
+
+/* ============================================================
+   COMPONENTES COMUNS
+   ============================================================ */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+
+.section-title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text2);
+  margin-bottom: 16px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-green  { background: rgba(34,197,94,0.12);  color: var(--green);  }
+.badge-yellow { background: rgba(234,179,8,0.12);  color: var(--yellow); }
+.badge-red    { background: rgba(239,68,68,0.12);  color: var(--red);    }
+.badge-blue   { background: rgba(59,130,246,0.12); color: var(--blue);   }
+.badge-orange { background: rgba(249,115,22,0.12); color: var(--accent); }
+.badge-gray   { background: rgba(136,136,136,0.1); color: var(--text2);  }
+.badge-purple { background: rgba(168,85,247,0.12); color: var(--purple); }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+
+.stat-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+}
+
+.stat-number { font-size: 28px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+.stat-label  { font-size: 11px; color: var(--text2); }
+
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text3);
+}
+
+.empty-state svg { width: 40px; height: 40px; margin: 0 auto 12px; display: block; }
+.empty-state p { font-size: 13px; }
+
+/* ============================================================
+   CALENDÁRIO DE CONTEÚDO
+   ============================================================ */
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-icon {
+  width: 32px; height: 32px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text2);
+  transition: all 0.15s;
+}
+
+.btn-icon:hover { color: var(--text); border-color: var(--text3); }
+
+.calendar-month-label { font-size: 16px; font-weight: 700; }
+
+.calendar-grid {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+}
+
+.calendar-weekday {
+  padding: 10px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text3);
+}
+
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar-day {
+  min-height: 90px;
+  padding: 8px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.calendar-day:hover { background: var(--bg3); }
+.calendar-day.other-month { background: var(--bg); opacity: 0.4; }
+.calendar-day.today .day-num { color: var(--accent); font-weight: 700; }
+
+.day-num {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: 4px;
+}
+
+.day-posts { display: flex; flex-direction: column; gap: 2px; }
+
+.day-post {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  border-left: 2px solid;
+}
+
+.day-post.status-pendente    { background: rgba(234,179,8,0.1);   border-color: var(--yellow); color: var(--yellow); }
+.day-post.status-em-revisao  { background: rgba(59,130,246,0.1);  border-color: var(--blue);   color: var(--blue);   }
+.day-post.status-aprovado    { background: rgba(34,197,94,0.1);   border-color: var(--green);  color: var(--green);  }
+.day-post.status-alteracao   { background: rgba(249,115,22,0.1);  border-color: var(--accent); color: var(--accent); }
+.day-post.status-cancelado   { background: rgba(136,136,136,0.1); border-color: var(--text3);  color: var(--text3);  }
+.day-post.status-agendado    { background: rgba(168,85,247,0.1);  border-color: var(--purple); color: var(--purple); }
+.day-post.status-bloqueado   { background: rgba(239,68,68,0.1);   border-color: var(--red);    color: var(--red);    }
+
+/* ============================================================
+   FEED SIMULADO (GRID INSTAGRAM)
+   ============================================================ */
+.feed-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.feed-item {
+  aspect-ratio: 1;
+  background: var(--bg3);
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.feed-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.feed-item-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.feed-item:hover .feed-item-overlay { opacity: 1; }
+
+.feed-item-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text3);
+}
+
+.feed-status-dot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--bg);
+}
+
+/* ============================================================
+   CARD DE POST — ABAS
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 760px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 32px 100px rgba(0,0,0,0.5);
+}
+
+.modal-header {
+  padding: 20px 24px 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  background: var(--bg2);
+  z-index: 10;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 16px;
+}
+
+.modal-info { flex: 1; min-width: 0; }
+.modal-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.modal-meta  { font-size: 11px; color: var(--text2); display: flex; gap: 12px; }
+
+.btn-close {
+  width: 32px; height: 32px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text2);
+  font-size: 18px;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+
+.btn-close:hover { color: var(--red); border-color: var(--red); }
+
+/* ABAS DO MODAL */
+.tab-bar {
+  display: flex;
+  padding: 0 24px;
+  gap: 0;
+  background: var(--bg2);
+  overflow-x: auto;
+}
+
+.tab-btn {
+  padding: 12px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text3);
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font);
+}
+
+.tab-btn:hover { color: var(--text2); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-btn.locked { color: var(--text3); cursor: not-allowed; opacity: 0.5; }
+
+.tab-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--text3);
+}
+
+.tab-dot.green  { background: var(--green);  }
+.tab-dot.yellow { background: var(--yellow); }
+.tab-dot.blue   { background: var(--blue);   }
+.tab-dot.red    { background: var(--red);    }
+
+.tab-content { padding: 24px; display: none; }
+.tab-content.active { display: block; }
+
+/* AÇÕES DE APROVAÇÃO */
+.approval-box {
+  margin-top: 20px;
+  padding: 16px;
+  background: var(--bg3);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.approval-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.approval-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-approve {
+  flex: 1;
+  padding: 10px;
+  background: rgba(34,197,94,0.1);
+  border: 1px solid rgba(34,197,94,0.3);
+  border-radius: var(--radius);
+  color: var(--green);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-approve:hover { background: rgba(34,197,94,0.2); }
+
+.btn-request-change {
+  flex: 1;
+  padding: 10px;
+  background: rgba(249,115,22,0.1);
+  border: 1px solid rgba(249,115,22,0.3);
+  border-radius: var(--radius);
+  color: var(--accent);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-request-change:hover { background: rgba(249,115,22,0.2); }
+.btn-request-change:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.comment-area {
+  margin-top: 12px;
+  display: none;
+}
+
+.comment-area.open { display: block; }
+
+.comment-area textarea {
+  width: 100%;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+  resize: vertical;
+  min-height: 80px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.comment-area textarea:focus { border-color: var(--accent); }
+
+.btn-send-change {
+  margin-top: 10px;
+  padding: 9px 20px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-send-change:hover { background: var(--accent2); }
+
+.alt-counter {
+  font-size: 11px;
+  color: var(--text3);
+  font-family: var(--mono);
+}
+
+/* BLOQUEIO 3ª ALTERAÇÃO */
+.block-banner {
+  padding: 16px;
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.25);
+  border-radius: var(--radius);
+  margin-top: 12px;
+}
+
+.block-banner-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--red);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.block-banner p {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.btn-confirm-charge {
+  padding: 9px 20px;
+  background: var(--red);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-confirm-charge:hover { opacity: 0.85; }
+
+/* MÍDIA */
+.media-container {
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--bg3);
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.media-container img { max-width: 100%; display: block; }
+.media-container video { max-width: 100%; display: block; }
+
+.carousel-viewer {
+  position: relative;
+  overflow: hidden;
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.3s ease;
+}
+
+.carousel-slide { flex: 0 0 100%; }
+.carousel-slide img { width: 100%; }
+
+.carousel-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.carousel-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.carousel-dot.active { background: var(--accent); }
+
+/* ============================================================
+   ADM — LISTA DE CLIENTES
+   ============================================================ */
+.clients-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.client-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.client-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+
+.client-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.client-avatar {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.client-name { font-size: 14px; font-weight: 700; }
+.client-segment { font-size: 11px; color: var(--text3); }
+
+.client-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.client-stat {
+  background: var(--bg3);
+  border-radius: 8px;
+  padding: 8px;
+  text-align: center;
+}
+
+.client-stat-num  { font-size: 18px; font-weight: 700; }
+.client-stat-lbl  { font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* ============================================================
+   ADM — CRIAR/EDITAR POST
+   ============================================================ */
+.form-group { margin-bottom: 16px; }
+
+.form-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text2);
+  margin-bottom: 6px;
+}
+
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
+
+.form-select { appearance: none; cursor: pointer; }
+
+.form-textarea { resize: vertical; min-height: 100px; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.btn-secondary {
+  padding: 10px 20px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-secondary:hover { border-color: var(--text2); }
+
+.btn-danger {
+  padding: 10px 20px;
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: var(--radius);
+  color: var(--red);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-danger:hover { background: rgba(239,68,68,0.2); }
+
+/* ============================================================
+   TOAST NOTIFICAÇÕES
+   ============================================================ */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toast {
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 500;
+  max-width: 320px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  animation: slideIn 0.3s ease;
+  border: 1px solid;
+}
+
+.toast.success { background: var(--bg2); border-color: rgba(34,197,94,0.4); color: var(--green); }
+.toast.error   { background: var(--bg2); border-color: rgba(239,68,68,0.4); color: var(--red);   }
+.toast.info    { background: var(--bg2); border-color: rgba(59,130,246,0.4); color: var(--blue); }
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+/* ============================================================
+   UTILITÁRIOS
+   ============================================================ */
+.flex { display: flex; }
+.flex-center { display: flex; align-items: center; }
+.gap-8  { gap: 8px;  }
+.gap-12 { gap: 12px; }
+.gap-16 { gap: 16px; }
+.mb-16  { margin-bottom: 16px; }
+.mb-24  { margin-bottom: 24px; }
+.mt-16  { margin-top: 16px; }
+.text-right { text-align: right; }
+
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+.status-bar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.status-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text2);
+}
+
+.status-pill span { font-weight: 700; }
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  color: var(--text3);
+  gap: 10px;
+}
+
+.spinner {
+  width: 20px; height: 20px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* APPROVED — estado final */
+.approved-state {
+  padding: 20px;
+  background: rgba(34,197,94,0.08);
+  border: 1px solid rgba(34,197,94,0.2);
+  border-radius: var(--radius);
+  margin-top: 12px;
+  text-align: center;
+}
+
+.approved-state svg { color: var(--green); width: 24px; height: 24px; margin: 0 auto 8px; display: block; }
+.approved-state p { font-size: 13px; color: var(--green); font-weight: 600; }
+.approved-state small { font-size: 11px; color: var(--text3); }
+
+/* ADM — reverter aprovação */
+.btn-revert {
+  margin-top: 8px;
+  padding: 7px 14px;
+  background: none;
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 8px;
+  color: var(--red);
+  font-size: 11px;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-revert:hover { background: rgba(239,68,68,0.1); }
+
+/* TABS PROGRESS */
+.tabs-progress {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  gap: 0;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+
+.progress-step {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.step-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.step-dot.done    { background: var(--green); }
+.step-dot.active  { background: var(--accent); }
+.step-dot.waiting { background: var(--text3); }
+
+.step-line {
+  width: 40px; height: 1px;
+  background: var(--border);
+}
+
+.step-line.done { background: var(--green); }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     TELA DE LOGIN
+     ============================================================ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <!-- Logo Labareda (chama de fogo) -->
+      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M24 4C24 4 14 14 14 24C14 29.5 17 34 20 37C19 34 20 30 23 28C23 32 25 35 28 37C30 34 30 30 28 26C31 28 33 32 32 37C35 34 36 29 36 24C36 16 30 8 24 4Z" fill="#f97316"/>
+        <path d="M24 20C24 20 20 24 20 28C20 31 22 33 24 34C23 32 23 29 25 27C25 30 26 32 28 33C29 31 29 28 27 26C29 27 30 30 30 32C32 30 32 27 30 24C28 21 26 19 24 20Z" fill="#fbbf24"/>
+      </svg>
+      <h1>Labareda Hub</h1>
+      <span>Portal de Aprovação</span>
+    </div>
+
+    <div class="login-form">
+      <div class="login-field">
+        <label>Usuário</label>
+        <input type="text" id="login-user" placeholder="Seu nome de acesso" autocomplete="off">
+      </div>
+      <div class="login-field">
+        <label>Senha</label>
+        <input type="password" id="login-pass" placeholder="••••••••">
+      </div>
+      <p class="login-error" id="login-error"></p>
+      <button class="btn-primary" onclick="doLogin()">Entrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     APP PRINCIPAL
+     ============================================================ -->
+<div id="app">
+  <div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <svg viewBox="0 0 28 28" fill="none">
+          <path d="M14 2C14 2 8 8 8 14C8 17.3 9.8 20.2 12 22C11.4 20 12 17.8 13.8 16.7C13.8 19 15 21 17 22C18.2 20 18.2 17.6 16.6 15.7C18.2 16.7 19.2 19 18.8 21.7C20.5 20 21 17.4 21 14C21 9.6 17.6 4.8 14 2Z" fill="#f97316"/>
+        </svg>
+        <span>Labareda Hub</span>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label" id="nav-section-label">Menu</div>
+        <nav class="sidebar-nav" id="sidebar-nav">
+          <!-- preenchido pelo JS conforme o perfil -->
+        </nav>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="user-avatar" id="user-avatar-initials">?</div>
+          <div class="user-details">
+            <div class="user-name" id="user-display-name">—</div>
+            <div class="user-role" id="user-display-role">—</div>
+          </div>
+        </div>
+        <button class="btn-logout" onclick="doLogout()">Sair</button>
+      </div>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div class="main-content">
+
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <div class="topbar-title" id="topbar-title">Painel</div>
+          <div class="topbar-subtitle" id="topbar-subtitle"></div>
+        </div>
+        <div class="theme-switcher">
+          <button class="theme-btn active" title="Dark" onclick="setTheme('dark', this)">🌙</button>
+          <button class="theme-btn" title="Clean" onclick="setTheme('clean', this)">☀️</button>
+          <button class="theme-btn" title="Cor" onclick="setTheme('color', this)">🔥</button>
+        </div>
+      </header>
+
+      <!-- PÁGINAS -->
+
+      <!-- DASHBOARD ADM -->
+      <div class="page" id="page-dashboard">
+        <div class="mb-24">
+          <div class="section-title">Visão Geral</div>
+          <div class="grid-4" id="adm-stats">
+            <div class="stat-card"><div class="stat-number" style="color:var(--text)" id="stat-total">0</div><div class="stat-label">Total de Posts</div></div>
+            <div class="stat-card"><div class="stat-number" style="color:var(--blue)" id="stat-revisao">0</div><div class="stat-label">Em Revisão</div></div>
+            <div class="stat-card"><div class="stat-number" style="color:var(--green)" id="stat-aprovados">0</div><div class="stat-label">Aprovados</div></div>
+            <div class="stat-card"><div class="stat-number" style="color:var(--accent)" id="stat-alteracao">0</div><div class="stat-label">Com Alteração</div></div>
+          </div>
+        </div>
+
+        <div class="mb-16 flex-center gap-12">
+          <div class="section-title" style="margin:0">Clientes</div>
+          <button class="btn-primary" style="width:auto;padding:8px 16px;font-size:12px" onclick="showPage('page-novo-cliente')">+ Novo Cliente</button>
+        </div>
+        <div class="clients-grid" id="clients-grid">
+          <div class="loading"><div class="spinner"></div> Carregando...</div>
+        </div>
+      </div>
+
+      <!-- CLIENTE INDIVIDUAL (ADM VIEW) -->
+      <div class="page" id="page-cliente-adm">
+        <div class="flex-center gap-12 mb-24">
+          <button class="btn-icon" onclick="showPage('page-dashboard')">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 12L6 8l4-4"/></svg>
+          </button>
+          <div>
+            <div class="topbar-title" id="adm-client-name">Cliente</div>
+            <div class="topbar-subtitle" id="adm-client-segment"></div>
+          </div>
+          <div style="margin-left:auto;display:flex;gap:8px">
+            <button class="btn-primary" style="width:auto;padding:8px 16px;font-size:12px" onclick="showPage('page-novo-post')">+ Novo Post</button>
+          </div>
+        </div>
+
+        <div class="status-bar" id="adm-status-bar"></div>
+
+        <div class="grid-2">
+          <div>
+            <div class="section-title">Calendário</div>
+            <div class="calendar-header">
+              <div class="calendar-nav">
+                <button class="btn-icon" onclick="changeMonth(-1)">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 12L6 8l4-4"/></svg>
+                </button>
+                <span class="calendar-month-label" id="calendar-label">Maio 2026</span>
+                <button class="btn-icon" onclick="changeMonth(1)">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4l4 4-4 4"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="calendar-grid">
+              <div class="calendar-weekdays">
+                <div class="calendar-weekday">Dom</div><div class="calendar-weekday">Seg</div>
+                <div class="calendar-weekday">Ter</div><div class="calendar-weekday">Qua</div>
+                <div class="calendar-weekday">Qui</div><div class="calendar-weekday">Sex</div>
+                <div class="calendar-weekday">Sáb</div>
+              </div>
+              <div class="calendar-days" id="calendar-days"></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="section-title">Feed Simulado (Instagram)</div>
+            <div class="feed-grid" id="feed-grid"></div>
+          </div>
+        </div>
+
+        <div class="mt-16">
+          <div class="section-title">Todos os Posts</div>
+          <div id="posts-list"></div>
+        </div>
+      </div>
+
+      <!-- DASHBOARD CLIENTE -->
+      <div class="page" id="page-cliente-hub">
+        <div class="status-bar" id="client-status-bar"></div>
+
+        <div class="grid-2">
+          <div>
+            <div class="section-title">Calendário de Conteúdo</div>
+            <div class="calendar-header">
+              <div class="calendar-nav">
+                <button class="btn-icon" onclick="changeMonth(-1)">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 12L6 8l4-4"/></svg>
+                </button>
+                <span class="calendar-month-label" id="client-calendar-label">Maio 2026</span>
+                <button class="btn-icon" onclick="changeMonth(1)">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4l4 4-4 4"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="calendar-grid">
+              <div class="calendar-weekdays">
+                <div class="calendar-weekday">Dom</div><div class="calendar-weekday">Seg</div>
+                <div class="calendar-weekday">Ter</div><div class="calendar-weekday">Qua</div>
+                <div class="calendar-weekday">Qui</div><div class="calendar-weekday">Sex</div>
+                <div class="calendar-weekday">Sáb</div>
+              </div>
+              <div class="calendar-days" id="client-calendar-days"></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="section-title">Feed Simulado (Instagram)</div>
+            <div class="feed-grid" id="client-feed-grid"></div>
+            <div class="mt-16" style="font-size:11px;color:var(--text3);text-align:center">
+              Visualização do grid como aparece no Instagram
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-16">
+          <div class="section-title">Posts Aguardando Sua Aprovação</div>
+          <div id="client-posts-list"></div>
+        </div>
+      </div>
+
+      <!-- NOVO CLIENTE -->
+      <div class="page" id="page-novo-cliente">
+        <div class="flex-center gap-12 mb-24">
+          <button class="btn-icon" onclick="showPage('page-dashboard')">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 12L6 8l4-4"/></svg>
+          </button>
+          <div class="topbar-title">Novo Cliente</div>
+        </div>
+        <div class="card" style="max-width:560px">
+          <div class="form-group">
+            <label class="form-label">Nome completo do cliente *</label>
+            <input class="form-input" id="nc-nome" placeholder="Ex: Pluma Baby">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Segmento</label>
+              <input class="form-input" id="nc-segmento" placeholder="Ex: Moda infantil">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Instagram</label>
+              <input class="form-input" id="nc-instagram" placeholder="@perfil">
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="section-title">Credenciais de Acesso (geradas automaticamente)</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Login (gerado)</label>
+              <input class="form-input" id="nc-login" placeholder="Preenchido automaticamente" readonly style="opacity:0.6">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Senha (gerada)</label>
+              <input class="form-input" id="nc-senha" placeholder="Preenchido automaticamente" readonly style="opacity:0.6">
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:8px">
+            <button class="btn-secondary" onclick="showPage('page-dashboard')">Cancelar</button>
+            <button class="btn-primary" style="width:auto;flex:1" onclick="criarCliente()">Criar Cliente</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOVO POST -->
+      <div class="page" id="page-novo-post">
+        <div class="flex-center gap-12 mb-24">
+          <button class="btn-icon" id="back-to-client">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 12L6 8l4-4"/></svg>
+          </button>
+          <div class="topbar-title">Novo Post</div>
+        </div>
+        <div class="card" style="max-width:700px">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nome do post *</label>
+              <input class="form-input" id="np-nome" placeholder="Título do conteúdo">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tipo</label>
+              <select class="form-select" id="np-tipo">
+                <option value="Post Único">Post Único</option>
+                <option value="Post Carrossel">Post Carrossel</option>
+                <option value="Reels">Reels</option>
+                <option value="Story">Story</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Data de publicação *</label>
+              <input class="form-input" type="date" id="np-data">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Objetivo</label>
+              <select class="form-select" id="np-objetivo">
+                <option value="Engajamento">Engajamento</option>
+                <option value="Conversão">Conversão</option>
+                <option value="Autoridade">Autoridade</option>
+                <option value="Relacionamento">Relacionamento</option>
+                <option value="Data comemorativa">Data comemorativa</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="section-title">Conteúdo das Abas</div>
+
+          <div class="form-group">
+            <label class="form-label">Tema do post</label>
+            <input class="form-input" id="np-tema" placeholder="Tema definido na reunião editorial">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Conteúdo / Copy / Roteiro</label>
+            <textarea class="form-textarea" id="np-conteudo" placeholder="Copy do post, lâminas do carrossel ou roteiro do vídeo..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Legenda</label>
+            <textarea class="form-textarea" id="np-legenda" placeholder="Copy final que vai na legenda da publicação..." style="min-height:80px"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">URL da Mídia (imagem/vídeo)</label>
+            <input class="form-input" id="np-midia-url" placeholder="https://... (link direto da imagem ou vídeo)">
+          </div>
+          <div class="form-group np-capa-field" style="display:none">
+            <label class="form-label">URL da Capa do Reels</label>
+            <input class="form-input" id="np-capa-url" placeholder="https://... (thumbnail do Reels)">
+          </div>
+
+          <div style="display:flex;gap:10px;margin-top:8px">
+            <button class="btn-secondary" id="cancel-new-post">Cancelar</button>
+            <button class="btn-primary" style="width:auto;flex:1" onclick="criarPost()">Criar Post</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main-content -->
+  </div><!-- /app-layout -->
+</div><!-- /app -->
+
+<!-- ============================================================
+     MODAL DE POST (ABAS DE APROVAÇÃO)
+     ============================================================ -->
+<div class="modal-overlay" id="post-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-info">
+        <div class="modal-title" id="modal-post-title">Título do post</div>
+        <div class="modal-meta">
+          <span id="modal-post-tipo"></span>
+          <span id="modal-post-data"></span>
+          <span id="modal-post-objetivo"></span>
+        </div>
+      </div>
+      <button class="btn-close" onclick="closeModal()">×</button>
+    </div>
+
+    <!-- BARRA DE PROGRESSO DAS ABAS -->
+    <div class="tab-bar" id="modal-tab-bar">
+      <!-- abas injetadas pelo JS -->
+    </div>
+
+    <!-- CONTEÚDO DAS ABAS -->
+    <div id="modal-tab-contents">
+      <!-- conteúdo injetado pelo JS -->
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+/* ============================================================
+   CONFIG SUPABASE
+   ============================================================ */
+const SUPABASE_URL = 'https://gdhnjgdnwbuntonapxgz.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdkaG5qZ2Rud2J1bnRvbmFweGd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3MDMxOTAsImV4cCI6MjA1OTI3OTE5MH0.5EE1Y-Dp11c_J56Djpkqn3S2FZNOv87e3lFBD6UjdCE';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* ============================================================
+   NOTION CONFIG
+   ============================================================ */
+const NOTION_TOKEN = null; // Será configurado via painel ADM
+const NOTION_DB_TAREFAS = '30c7ab14670080b7b2e2c6e16de46d8e';
+
+/* ============================================================
+   ESTADO GLOBAL
+   ============================================================ */
+let currentUser   = null;
+let currentClient = null;
+let currentPost   = null;
+let currentTab    = 0;
+let calendarDate  = new Date();
+let allPosts      = [];
+let isAdmin       = false;
+
+/* ============================================================
+   USUÁRIOS HARDCODED (enquanto Supabase não tem tabela de usuarios)
+   ============================================================ */
+const USERS = {
+  'labareda': { senha: '290520.Ek', perfil: 'adm',     nome: 'Labareda',         clienteId: null },
+  'edivaldo':  { senha: 'ferreira', perfil: 'adm',     nome: 'Edivaldo Ferreira', clienteId: null },
+  'kethly':    { senha: 'suely',    perfil: 'adm',     nome: 'Kethly Suely',      clienteId: null },
+  'pluma':     { senha: 'baby',     perfil: 'cliente',  nome: 'Pluma Baby',        clienteId: 'pluma-baby' },
+  'ricardinho':{ senha: 'lanches',  perfil: 'cliente',  nome: 'Ricardinho Lanches',clienteId: 'ricardinho-lanches' },
+  'thaís':     { senha: 'andrade',  perfil: 'cliente',  nome: 'Thaís Andrade',     clienteId: 'thais-andrade' },
+  'marcos':    { senha: 'adriano',  perfil: 'cliente',  nome: 'Marcos Adriano',    clienteId: 'marcos-adriano' },
+  'magnólia':  { senha: 'sousa',    perfil: 'cliente',  nome: 'Magnólia Sousa',    clienteId: 'magnolia-sousa' },
+};
+
+/* ============================================================
+   CLIENTES PRÉ-CONFIGURADOS
+   ============================================================ */
+const CLIENTS_CONFIG = {
+  'pluma-baby':          { nome: 'Pluma Baby',          segmento: 'Moda Infantil',   instagram: '@plumababy',       notionCalId: '3c1e7963-d58a-4d11-b88e-d63187a5c816' },
+  'ricardinho-lanches':  { nome: 'Ricardinho Lanches',  segmento: 'Alimentação',     instagram: '@ricardinholanches', notionCalId: null },
+  'thais-andrade':       { nome: 'Thaís Andrade',       segmento: 'Geral',           instagram: '@thaisandrade',    notionCalId: null },
+  'marcos-adriano':      { nome: 'Marcos Adriano',      segmento: 'Geral',           instagram: '@marcosadrianooficial', notionCalId: null },
+  'magnolia-sousa':      { nome: 'Magnólia Sousa',      segmento: 'Nutrição',        instagram: '@magnoliasousa',   notionCalId: null },
+};
+
+/* ============================================================
+   ABAS POR TIPO DE POST
+   ============================================================ */
+function getTabsForType(tipo) {
+  const base = ['tema','conteudo','midia','legenda'];
+  if (tipo === 'Reels') return ['tema','conteudo','midia','capa','legenda'];
+  return base;
+}
+
+const TAB_LABELS = {
+  tema:     'Tema',
+  conteudo: 'Conteúdo',
+  midia:    'Mídia',
+  capa:     'Capa',
+  legenda:  'Legenda',
+};
+
+/* ============================================================
+   LOGIN / LOGOUT
+   ============================================================ */
+function doLogin() {
+  const user = document.getElementById('login-user').value.trim().toLowerCase();
+  const pass = document.getElementById('login-pass').value.trim().toLowerCase();
+  const err  = document.getElementById('login-error');
+
+  const found = Object.entries(USERS).find(([k,v]) => k.toLowerCase() === user && v.senha.toLowerCase() === pass);
+
+  if (!found) {
+    err.textContent = 'Usuário ou senha incorretos.';
+    return;
+  }
+
+  err.textContent = '';
+  const [, userData] = found;
+  currentUser = { login: user, ...userData };
+  isAdmin = userData.perfil === 'adm';
+
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+
+  renderUserInfo();
+  buildSidebar();
+  if (isAdmin) {
+    showPage('page-dashboard');
+    loadAdmDashboard();
+  } else {
+    currentClient = CLIENTS_CONFIG[currentUser.clienteId];
+    showPage('page-cliente-hub');
+    loadClientHub();
+  }
+}
+
+function doLogout() {
+  currentUser   = null;
+  currentClient = null;
+  currentPost   = null;
+  isAdmin       = false;
+  allPosts      = [];
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-user').value = '';
+  document.getElementById('login-pass').value = '';
+}
+
+document.getElementById('login-pass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+function renderUserInfo() {
+  const initials = currentUser.nome.split(' ').map(w=>w[0]).slice(0,2).join('');
+  document.getElementById('user-avatar-initials').textContent = initials;
+  document.getElementById('user-display-name').textContent    = currentUser.nome;
+  document.getElementById('user-display-role').textContent    = isAdmin ? 'Administrador' : 'Cliente';
+}
+
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+function buildSidebar() {
+  const nav = document.getElementById('sidebar-nav');
+  if (isAdmin) {
+    nav.innerHTML = `
+      <button class="nav-item active" data-page="page-dashboard" onclick="navClick(this,'page-dashboard');loadAdmDashboard()">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-item" data-page="page-novo-cliente" onclick="navClick(this,'page-novo-cliente')">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M13 6v4M11 8h4"/></svg>
+        Novo Cliente
+      </button>`;
+  } else {
+    nav.innerHTML = `
+      <button class="nav-item active" data-page="page-cliente-hub" onclick="navClick(this,'page-cliente-hub');loadClientHub()">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+        Meu Conteúdo
+      </button>`;
+  }
+}
+
+function navClick(el, page) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+  showPage(page);
+}
+
+/* ============================================================
+   PÁGINAS
+   ============================================================ */
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+
+  const titles = {
+    'page-dashboard':    ['Dashboard', 'Visão geral de todos os clientes'],
+    'page-cliente-adm':  ['Cliente', ''],
+    'page-cliente-hub':  ['Meu Conteúdo', 'Visualize e aprove seus posts'],
+    'page-novo-cliente': ['Novo Cliente', 'Cadastrar novo cliente'],
+    'page-novo-post':    ['Novo Post', 'Criar conteúdo para aprovação'],
+  };
+  if (titles[id]) {
+    document.getElementById('topbar-title').textContent    = titles[id][0];
+    document.getElementById('topbar-subtitle').textContent = titles[id][1];
+  }
+}
+
+/* ============================================================
+   TEMA
+   ============================================================ */
+function setTheme(theme, btn) {
+  document.body.removeAttribute('data-theme');
+  if (theme !== 'dark') document.body.setAttribute('data-theme', theme);
+  document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+/* ============================================================
+   SUPABASE — HELPERS
+   ============================================================ */
+async function getPosts(clienteId) {
+  const { data, error } = await sb.from('hub_posts').select('*').eq('cliente_id', clienteId).order('data_publicacao', { ascending: true });
+  if (error) { console.error(error); return []; }
+  return data || [];
+}
+
+async function getAbas(postId) {
+  const { data, error } = await sb.from('hub_abas').select('*').eq('post_id', postId);
+  if (error) { console.error(error); return []; }
+  return data || [];
+}
+
+async function updateAba(abaId, updates) {
+  const { error } = await sb.from('hub_abas').update(updates).eq('id', abaId);
+  if (error) throw error;
+}
+
+async function getClients() {
+  const { data, error } = await sb.from('hub_clientes').select('*').order('nome');
+  if (error) { console.error(error); return []; }
+  return data || [];
+}
+
+/* ============================================================
+   SETUP INICIAL — criar tabelas se não existem (via upsert)
+   ============================================================ */
+async function ensureTables() {
+  // Tenta inserir clientes padrão se a tabela existir
+  for (const [id, cfg] of Object.entries(CLIENTS_CONFIG)) {
+    await sb.from('hub_clientes').upsert({
+      id, nome: cfg.nome, segmento: cfg.segmento,
+      instagram: cfg.instagram, notion_cal_id: cfg.notionCalId
+    }, { onConflict: 'id', ignoreDuplicates: true });
+  }
+}
+
+/* ============================================================
+   ADM DASHBOARD
+   ============================================================ */
+async function loadAdmDashboard() {
+  await ensureTables();
+  const grid = document.getElementById('clients-grid');
+  grid.innerHTML = '<div class="loading"><div class="spinner"></div> Carregando...</div>';
+
+  // Carrega posts de todos os clientes para stats
+  const { data: posts } = await sb.from('hub_posts').select('*');
+  const allP = posts || [];
+
+  document.getElementById('stat-total').textContent    = allP.length;
+  document.getElementById('stat-revisao').textContent  = allP.filter(p=>p.status_geral==='em-revisao').length;
+  document.getElementById('stat-aprovados').textContent= allP.filter(p=>p.status_geral==='aprovado').length;
+  document.getElementById('stat-alteracao').textContent= allP.filter(p=>p.status_geral==='alteracao').length;
+
+  const clients = Object.entries(CLIENTS_CONFIG);
+  grid.innerHTML = '';
+
+  for (const [cid, cfg] of clients) {
+    const clientPosts = allP.filter(p => p.cliente_id === cid);
+    const emRevisao   = clientPosts.filter(p=>p.status_geral==='em-revisao').length;
+    const aprovados   = clientPosts.filter(p=>p.status_geral==='aprovado').length;
+    const alteracao   = clientPosts.filter(p=>p.status_geral==='alteracao').length;
+    const initials    = cfg.nome.split(' ').map(w=>w[0]).slice(0,2).join('');
+
+    const card = document.createElement('div');
+    card.className = 'client-card';
+    card.onclick = () => openClientAdm(cid);
+    card.innerHTML = `
+      <div class="client-card-header">
+        <div class="client-avatar">${initials}</div>
+        <div>
+          <div class="client-name">${cfg.nome}</div>
+          <div class="client-segment">${cfg.segmento}</div>
+        </div>
+      </div>
+      <div class="client-stats">
+        <div class="client-stat">
+          <div class="client-stat-num" style="color:var(--blue)">${emRevisao}</div>
+          <div class="client-stat-lbl">Revisão</div>
+        </div>
+        <div class="client-stat">
+          <div class="client-stat-num" style="color:var(--green)">${aprovados}</div>
+          <div class="client-stat-lbl">Aprovados</div>
+        </div>
+        <div class="client-stat">
+          <div class="client-stat-num" style="color:var(--accent)">${alteracao}</div>
+          <div class="client-stat-lbl">Alteração</div>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+  }
+}
+
+/* ============================================================
+   ADM — CLIENTE INDIVIDUAL
+   ============================================================ */
+async function openClientAdm(clienteId) {
+  currentClient = { id: clienteId, ...CLIENTS_CONFIG[clienteId] };
+  document.getElementById('adm-client-name').textContent    = currentClient.nome;
+  document.getElementById('adm-client-segment').textContent = currentClient.segmento;
+  document.getElementById('topbar-subtitle').textContent    = currentClient.nome;
+
+  document.getElementById('back-to-client').onclick    = () => showPage('page-cliente-adm');
+  document.getElementById('cancel-new-post').onclick   = () => showPage('page-cliente-adm');
+
+  showPage('page-cliente-adm');
+  allPosts = await getPosts(clienteId);
+  renderCalendar('calendar-days', 'calendar-label');
+  renderFeed('feed-grid');
+  renderPostsList('posts-list', true);
+  renderStatusBar('adm-status-bar');
+}
+
+/* ============================================================
+   CLIENTE HUB
+   ============================================================ */
+async function loadClientHub() {
+  allPosts = await getPosts(currentUser.clienteId);
+  renderCalendar('client-calendar-days', 'client-calendar-label');
+  renderFeed('client-feed-grid');
+  renderPostsList('client-posts-list', false);
+  renderStatusBar('client-status-bar');
+}
+
+/* ============================================================
+   STATUS BAR
+   ============================================================ */
+function renderStatusBar(containerId) {
+  const total     = allPosts.length;
+  const revisao   = allPosts.filter(p=>p.status_geral==='em-revisao').length;
+  const aprovado  = allPosts.filter(p=>p.status_geral==='aprovado').length;
+  const alteracao = allPosts.filter(p=>p.status_geral==='alteracao').length;
+  const cancelado = allPosts.filter(p=>p.status_geral==='cancelado').length;
+
+  document.getElementById(containerId).innerHTML = `
+    <div class="status-pill"><span style="color:var(--text)">${total}</span> Total</div>
+    <div class="status-pill"><span style="color:var(--blue)">${revisao}</span> Em revisão</div>
+    <div class="status-pill"><span style="color:var(--green)">${aprovado}</span> Aprovados</div>
+    <div class="status-pill"><span style="color:var(--accent)">${alteracao}</span> Alteração</div>
+    <div class="status-pill"><span style="color:var(--text3)">${cancelado}</span> Cancelados</div>`;
+}
+
+/* ============================================================
+   CALENDÁRIO
+   ============================================================ */
+function changeMonth(dir) {
+  calendarDate = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + dir, 1);
+  if (isAdmin) {
+    renderCalendar('calendar-days', 'calendar-label');
+  } else {
+    renderCalendar('client-calendar-days', 'client-calendar-label');
+  }
+}
+
+function renderCalendar(daysId, labelId) {
+  const months = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  document.getElementById(labelId).textContent = `${months[calendarDate.getMonth()]} ${calendarDate.getFullYear()}`;
+
+  const firstDay = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), 1).getDay();
+  const daysInMonth = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0).getDate();
+  const today = new Date();
+
+  const container = document.getElementById(daysId);
+  container.innerHTML = '';
+
+  // dias do mês anterior
+  for (let i = 0; i < firstDay; i++) {
+    const d = document.createElement('div');
+    d.className = 'calendar-day other-month';
+    container.appendChild(d);
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const d = document.createElement('div');
+    d.className = 'calendar-day';
+    const isToday = today.getDate()===day && today.getMonth()===calendarDate.getMonth() && today.getFullYear()===calendarDate.getFullYear();
+    if (isToday) d.classList.add('today');
+
+    const dateStr = `${calendarDate.getFullYear()}-${String(calendarDate.getMonth()+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const dayPosts = allPosts.filter(p => p.data_publicacao && p.data_publicacao.startsWith(dateStr));
+
+    d.innerHTML = `<div class="day-num">${day}</div><div class="day-posts">${
+      dayPosts.slice(0,3).map(p => `<div class="day-post status-${p.status_geral}" onclick="openPostModal('${p.id}',event)">${p.nome}</div>`).join('')
+    }${dayPosts.length>3?`<div style="font-size:9px;color:var(--text3);padding:2px 6px">+${dayPosts.length-3} mais</div>`:''}</div>`;
+
+    container.appendChild(d);
+  }
+}
+
+/* ============================================================
+   FEED SIMULADO
+   ============================================================ */
+function renderFeed(containerId) {
+  const container = document.getElementById(containerId);
+  const sorted = [...allPosts].sort((a,b) => new Date(b.data_publicacao) - new Date(a.data_publicacao)).slice(0, 9);
+
+  // Preenche com 9 slots
+  const slots = [...sorted];
+  while (slots.length < 9) slots.push(null);
+
+  container.innerHTML = slots.map((p,i) => {
+    if (!p) return `<div class="feed-item feed-item-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:24px;height:24px;color:var(--text3)"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9l4-4 4 4 4-4 4 4"/><circle cx="8" cy="15" r="2"/></svg></div>`;
+    const dotColor = {
+      'em-revisao':'var(--blue)', 'aprovado':'var(--green)',
+      'alteracao':'var(--accent)', 'cancelado':'var(--text3)',
+      'agendado':'var(--purple)', 'pendente':'var(--yellow)',
+    }[p.status_geral] || 'var(--text3)';
+    return `<div class="feed-item" onclick="openPostModal('${p.id}',event)">
+      ${p.midia_url ? `<img src="${p.midia_url}" alt="${p.nome}" onerror="this.style.display='none'">` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:10px;padding:8px;text-align:center">${p.nome}</div>`}
+      <div class="feed-status-dot" style="background:${dotColor}"></div>
+      <div class="feed-item-overlay">
+        <span style="font-size:11px;font-weight:600;color:#fff">${p.nome}</span>
+        <span class="badge badge-gray" style="font-size:9px">${p.tipo||''}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ============================================================
+   LISTA DE POSTS
+   ============================================================ */
+function renderPostsList(containerId, admView) {
+  const container = document.getElementById(containerId);
+  if (!allPosts.length) {
+    container.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8M8 8h8M8 16h5"/></svg><p>Nenhum post cadastrado</p></div>`;
+    return;
+  }
+
+  const filtered = admView ? allPosts : allPosts.filter(p => ['em-revisao','alteracao','pendente'].includes(p.status_geral));
+  if (!filtered.length && !admView) {
+    container.innerHTML = `<div class="empty-state"><p style="color:var(--green)">✅ Nenhum post aguardando sua aprovação!</p></div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map(p => {
+    const statusMap = {
+      'pendente':    ['⏳', 'badge-yellow', 'Aguardando'],
+      'em-revisao':  ['👁', 'badge-blue',   'Em revisão'],
+      'aprovado':    ['✅', 'badge-green',  'Aprovado'],
+      'alteracao':   ['✏️', 'badge-orange', 'Alteração'],
+      'cancelado':   ['❌', 'badge-gray',   'Cancelado'],
+      'agendado':    ['📅', 'badge-purple', 'Agendado'],
+    };
+    const [icon, cls, label] = statusMap[p.status_geral] || ['—','badge-gray','—'];
+    const data = p.data_publicacao ? new Date(p.data_publicacao + 'T12:00:00').toLocaleDateString('pt-BR') : '—';
+
+    return `<div class="card mb-16" style="cursor:pointer;transition:border-color 0.15s" onmouseenter="this.style.borderColor='var(--accent)'" onmouseleave="this.style.borderColor='var(--border)'" onclick="openPostModal('${p.id}',event)">
+      <div style="display:flex;align-items:center;gap:12px;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:10px;min-width:0">
+          <span style="font-size:16px">${icon}</span>
+          <div>
+            <div style="font-size:14px;font-weight:600">${p.nome}</div>
+            <div style="font-size:11px;color:var(--text3)">${p.tipo||''} · ${data}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+          <span class="badge ${cls}">${label}</span>
+          ${admView?`<button class="btn-danger" style="padding:5px 10px;font-size:11px" onclick="event.stopPropagation();confirmDelete('${p.id}')">Excluir</button>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ============================================================
+   MODAL DE POST
+   ============================================================ */
+async function openPostModal(postId, event) {
+  if (event) event.stopPropagation();
+  currentPost = allPosts.find(p => p.id === postId);
+  if (!currentPost) return;
+
+  const abas = await getAbas(postId);
+  const tipo  = currentPost.tipo || 'Post Único';
+  const tabs  = getTabsForType(tipo);
+
+  // Monta tab bar
+  const tabBar = document.getElementById('modal-tab-bar');
+  tabBar.innerHTML = tabs.map((tab, i) => {
+    const aba = abas.find(a => a.tipo === tab);
+    const status = aba ? aba.status : 'aguardando';
+    const dotClass = { aprovado:'green', 'em-revisao':'blue', 'alteracao-solicitada':'yellow', bloqueado:'red' }[status] || '';
+
+    // Verifica se aba está desbloqueada (todas as anteriores aprovadas)
+    const unlocked = i === 0 || tabs.slice(0, i).every(t => {
+      const prev = abas.find(a => a.tipo === t);
+      return prev && prev.status === 'aprovado';
+    });
+
+    return `<button class="tab-btn ${i===0?'active':''} ${!unlocked?'locked':''}" 
+      data-tab="${i}" data-tab-key="${tab}"
+      onclick="switchTab(${i}, ${!unlocked})"
+    >
+      <div class="tab-dot ${dotClass}"></div>
+      ${TAB_LABELS[tab]}
+    </button>`;
+  }).join('');
+
+  // Monta conteúdos
+  const contents = document.getElementById('modal-tab-contents');
+  contents.innerHTML = tabs.map((tab, i) => {
+    const aba = abas.find(a => a.tipo === tab);
+    return `<div class="tab-content ${i===0?'active':''}" id="tab-content-${i}" data-aba-id="${aba?.id||''}">
+      ${renderTabContent(tab, aba, isAdmin)}
+    </div>`;
+  }).join('');
+
+  // Header
+  document.getElementById('modal-post-title').textContent = currentPost.nome;
+  document.getElementById('modal-post-tipo').textContent  = currentPost.tipo || '';
+  document.getElementById('modal-post-data').textContent  = currentPost.data_publicacao
+    ? new Date(currentPost.data_publicacao + 'T12:00:00').toLocaleDateString('pt-BR') : '';
+  document.getElementById('modal-post-objetivo').textContent = currentPost.objetivo || '';
+
+  currentTab = 0;
+  document.getElementById('post-modal').classList.add('open');
+}
+
+function renderTabContent(tab, aba, admView) {
+  const status   = aba?.status || 'aguardando';
+  const content  = aba?.conteudo || '';
+  const comment  = aba?.comentario_cliente || '';
+  const altCount = aba?.contador_alteracoes || 0;
+  const abaId    = aba?.id || '';
+
+  let mediaHtml = '';
+  if (tab === 'midia') {
+    const url = currentPost?.midia_url || '';
+    if (!url) {
+      mediaHtml = `<div class="media-container"><div class="empty-state"><p>Mídia ainda não disponível</p></div></div>`;
+    } else if (url.match(/\.(mp4|mov|webm)$/i)) {
+      mediaHtml = `<div class="media-container"><video controls src="${url}"></video></div>`;
+    } else {
+      mediaHtml = `<div class="media-container"><img src="${url}" alt="Mídia do post"></div>`;
+    }
+  } else if (tab === 'capa') {
+    const capaUrl = currentPost?.capa_url || '';
+    mediaHtml = capaUrl
+      ? `<div class="media-container"><img src="${capaUrl}" alt="Capa do Reels"></div>`
+      : `<div class="media-container"><div class="empty-state"><p>Capa ainda não disponível</p></div></div>`;
+  }
+
+  const contentHtml = tab !== 'midia' && tab !== 'capa'
+    ? `<div style="font-size:14px;line-height:1.7;color:var(--text);white-space:pre-wrap;padding:4px 0">${content || '<span style="color:var(--text3)">Conteúdo ainda não disponível</span>'}</div>`
+    : '';
+
+  // Comentário existente
+  const commentHtml = comment
+    ? `<div style="margin-top:12px;padding:10px 14px;background:rgba(249,115,22,0.06);border:1px solid rgba(249,115,22,0.2);border-radius:8px">
+        <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Pedido de alteração</div>
+        <div style="font-size:13px;color:var(--text)">${comment}</div>
+      </div>` : '';
+
+  // Área de aprovação
+  let approvalHtml = '';
+  if (status === 'aguardando') {
+    approvalHtml = `<div class="approval-box"><div style="font-size:12px;color:var(--text3)">⏳ Aguardando conteúdo da equipe</div></div>`;
+  } else if (status === 'aprovado' && !admView) {
+    approvalHtml = `<div class="approved-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+      <p>Aprovado!</p><small>Você aprovou esta etapa</small>
+    </div>`;
+  } else if (status === 'aprovado' && admView) {
+    approvalHtml = `<div class="approved-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+      <p>Aprovado pelo cliente</p>
+      <button class="btn-revert" onclick="revertAba('${abaId}')">↩ Reverter aprovação</button>
+    </div>`;
+  } else if (status === 'em-revisao' || status === 'alteracao-solicitada') {
+    if (!admView) {
+      // Bloquear na 3ª alteração
+      if (altCount >= 2) {
+        approvalHtml = `<div class="approval-box">
+          <div class="approval-actions">
+            <button class="btn-approve" onclick="aprovarAba('${abaId}', '${tab}')">✓ Aprovar</button>
+          </div>
+          <div class="block-banner">
+            <div class="block-banner-title">🔒 Limite de alterações atingido</div>
+            <p>Você já utilizou 2 alterações gratuitas nesta etapa. Uma nova solicitação de alteração terá custo adicional de <strong>R$30,00</strong>. Ao confirmar, você aceita esta cobrança.</p>
+            <button class="btn-confirm-charge" onclick="solicitarAlteracaoPaga('${abaId}', '${tab}')">Confirmar e pagar R$30,00</button>
+          </div>
+        </div>`;
+      } else {
+        approvalHtml = `<div class="approval-box">
+          <div class="approval-status">
+            <span class="alt-counter">${altCount}/2 alterações usadas</span>
+          </div>
+          <div class="approval-actions">
+            <button class="btn-approve" onclick="aprovarAba('${abaId}', '${tab}')">✓ Aprovar</button>
+            <button class="btn-request-change" onclick="toggleComment('${abaId}')">✏ Solicitar alteração</button>
+          </div>
+          <div class="comment-area" id="comment-area-${abaId}">
+            <textarea id="comment-text-${abaId}" placeholder="Descreva o que precisa ser alterado..."></textarea>
+            <button class="btn-send-change" onclick="enviarAlteracao('${abaId}', '${tab}')">Enviar solicitação</button>
+          </div>
+        </div>`;
+      }
+    } else {
+      // ADM vê o que o cliente pediu
+      approvalHtml = `<div class="approval-box">
+        <div style="font-size:12px;color:var(--blue)">
+          ${status === 'alteracao-solicitada' ? '✏️ Cliente solicitou alteração' : '👁 Em revisão pelo cliente'}
+        </div>
+        ${commentHtml}
+      </div>`;
+    }
+  }
+
+  return `${mediaHtml}${contentHtml}${commentHtml && status !== 'em-revisao' && status !== 'alteracao-solicitada' ? '' : ''}${approvalHtml}`;
+}
+
+function switchTab(i, locked) {
+  if (locked) { showToast('Aprove as etapas anteriores primeiro.', 'info'); return; }
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll(`.tab-btn[data-tab="${i}"]`).forEach(b => b.classList.add('active'));
+  document.getElementById(`tab-content-${i}`)?.classList.add('active');
+  currentTab = i;
+}
+
+function closeModal() {
+  document.getElementById('post-modal').classList.remove('open');
+  currentPost = null;
+}
+
+/* ============================================================
+   AÇÕES DE APROVAÇÃO
+   ============================================================ */
+function toggleComment(abaId) {
+  const area = document.getElementById(`comment-area-${abaId}`);
+  if (area) area.classList.toggle('open');
+}
+
+async function aprovarAba(abaId, tabKey) {
+  if (!abaId) { showToast('Aba ainda não criada', 'error'); return; }
+  try {
+    await updateAba(abaId, { status: 'aprovado', updated_at: new Date().toISOString() });
+    showToast('✅ Aba aprovada!', 'success');
+
+    // Verifica se todas as abas estão aprovadas → gerar tarefa de agendamento
+    const allAbas = await getAbas(currentPost.id);
+    const tabs = getTabsForType(currentPost.tipo || 'Post Único');
+    const allApproved = tabs.every(t => {
+      const a = allAbas.find(x => x.tipo === t);
+      return a && a.status === 'aprovado';
+    });
+
+    if (allApproved) {
+      await updatePostStatus(currentPost.id, 'aprovado');
+      await criarTarefaNotion({
+        nome: `[${currentClient?.nome||''}] Agendar post — ${currentPost.nome}`,
+        tipo: 'Conteúdo',
+        responsavel: 'Kethly',
+        prioridade: 'Média',
+        prazo: subtractDays(currentPost.data_publicacao, 1),
+        cliente: currentClient?.nome || '',
+      });
+      showToast('🎉 Post totalmente aprovado! Tarefa de agendamento criada.', 'success');
+    }
+
+    await reloadModal();
+  } catch(e) {
+    showToast('Erro ao aprovar. Tente novamente.', 'error');
+    console.error(e);
+  }
+}
+
+async function enviarAlteracao(abaId, tabKey) {
+  const textarea = document.getElementById(`comment-text-${abaId}`);
+  const comment  = textarea?.value?.trim();
+  if (!comment) { showToast('Descreva o que precisa ser alterado.', 'info'); return; }
+
+  try {
+    const aba = await getAba(abaId);
+    const newCount = (aba?.contador_alteracoes || 0) + 1;
+
+    await updateAba(abaId, {
+      status: 'alteracao-solicitada',
+      comentario_cliente: comment,
+      contador_alteracoes: newCount,
+      updated_at: new Date().toISOString(),
+    });
+
+    await updatePostStatus(currentPost.id, 'alteracao');
+
+    // Mapeia responsável por aba
+    const resp = { tema:'Kethly', conteudo:'Edivaldo', midia:'Edivaldo', capa:'Edivaldo', legenda:'Edivaldo' };
+    const tipo = { tema:'Atendimento', conteudo:'Conteúdo', midia:'Produção', capa:'Produção', legenda:'Conteúdo' };
+    const label = TAB_LABELS[tabKey];
+
+    await criarTarefaNotion({
+      nome: `[${currentClient?.nome||''}] Alteração de ${label.toLowerCase()} — ${currentPost.nome}`,
+      tipo: tipo[tabKey] || 'Conteúdo',
+      responsavel: resp[tabKey] || 'Edivaldo',
+      prioridade: 'Alta',
+      prazo: subtractDays(currentPost.data_publicacao, 3),
+      cliente: currentClient?.nome || '',
+      descricao: comment,
+    });
+
+    showToast('✏️ Alteração solicitada! Tarefa criada para a equipe.', 'success');
+    await reloadModal();
+  } catch(e) {
+    showToast('Erro ao enviar alteração.', 'error');
+    console.error(e);
+  }
+}
+
+async function solicitarAlteracaoPaga(abaId, tabKey) {
+  if (!confirm('Ao confirmar, você aceita a cobrança adicional de R$30,00 por esta alteração. Continuar?')) return;
+
+  const textarea = document.createElement('textarea');
+  const comment  = prompt('Descreva o que precisa ser alterado:');
+  if (!comment) return;
+
+  try {
+    const aba = await getAba(abaId);
+    await updateAba(abaId, {
+      status: 'alteracao-solicitada',
+      comentario_cliente: comment,
+      contador_alteracoes: (aba?.contador_alteracoes || 0) + 1,
+      updated_at: new Date().toISOString(),
+    });
+
+    // Notifica ADM para cobrar
+    await criarTarefaNotion({
+      nome: `⚠️ [${currentClient?.nome||''}] 3ª alteração solicitada — ${TAB_LABELS[tabKey]} — ${currentPost.nome} — Cobrar R$30`,
+      tipo: 'Atendimento',
+      responsavel: 'Labareda',
+      prioridade: 'Alta',
+      prazo: subtractDays(currentPost.data_publicacao, 3),
+      cliente: currentClient?.nome || '',
+      descricao: `Pedido pago de alteração: ${comment}`,
+    });
+
+    showToast('⚠️ Solicitação enviada. Aguarde contato da equipe.', 'info');
+    await reloadModal();
+  } catch(e) {
+    showToast('Erro ao enviar solicitação.', 'error');
+  }
+}
+
+async function revertAba(abaId) {
+  if (!isAdmin) return;
+  if (!confirm('Reverter a aprovação desta aba? O cliente precisará aprovar novamente.')) return;
+  try {
+    await updateAba(abaId, { status: 'em-revisao', updated_at: new Date().toISOString() });
+    await updatePostStatus(currentPost.id, 'em-revisao');
+    showToast('Aprovação revertida.', 'info');
+    await reloadModal();
+  } catch(e) {
+    showToast('Erro ao reverter.', 'error');
+  }
+}
+
+async function reloadModal() {
+  const saved = currentPost;
+  const savedTab = currentTab;
+  closeModal();
+  allPosts = await getPosts(currentClient?.id || currentUser.clienteId);
+  currentPost = allPosts.find(p => p.id === saved.id);
+  if (currentPost) await openPostModal(currentPost.id, null);
+  switchTab(savedTab, false);
+}
+
+async function getAba(abaId) {
+  const { data } = await sb.from('hub_abas').select('*').eq('id', abaId).single();
+  return data;
+}
+
+async function updatePostStatus(postId, status) {
+  await sb.from('hub_posts').update({ status_geral: status, updated_at: new Date().toISOString() }).eq('id', postId);
+}
+
+/* ============================================================
+   CRIAR CLIENTE
+   ============================================================ */
+function gerarCredenciais() {
+  const nome = document.getElementById('nc-nome').value.trim();
+  if (!nome) return;
+  const partes = nome.split(' ');
+  document.getElementById('nc-login').value = partes[0];
+  document.getElementById('nc-senha').value = partes.slice(1).join('') || partes[0];
+}
+
+document.getElementById('nc-nome')?.addEventListener('input', gerarCredenciais);
+
+async function criarCliente() {
+  const nome     = document.getElementById('nc-nome').value.trim();
+  const segmento = document.getElementById('nc-segmento').value.trim();
+  const instagram= document.getElementById('nc-instagram').value.trim();
+
+  if (!nome) { showToast('Nome é obrigatório.', 'error'); return; }
+
+  const id = nome.toLowerCase().replace(/\s+/g, '-').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+  const { error } = await sb.from('hub_clientes').upsert({ id, nome, segmento, instagram }, { onConflict: 'id' });
+  if (error) { showToast('Erro ao criar cliente.', 'error'); return; }
+
+  showToast(`✅ Cliente ${nome} criado!`, 'success');
+  showPage('page-dashboard');
+  loadAdmDashboard();
+}
+
+/* ============================================================
+   CRIAR POST
+   ============================================================ */
+document.getElementById('np-tipo')?.addEventListener('change', function() {
+  const capaField = document.querySelector('.np-capa-field');
+  if (capaField) capaField.style.display = this.value === 'Reels' ? 'block' : 'none';
+});
+
+async function criarPost() {
+  const nome     = document.getElementById('np-nome').value.trim();
+  const tipo     = document.getElementById('np-tipo').value;
+  const data     = document.getElementById('np-data').value;
+  const objetivo = document.getElementById('np-objetivo').value;
+  const tema     = document.getElementById('np-tema').value.trim();
+  const conteudo = document.getElementById('np-conteudo').value.trim();
+  const legenda  = document.getElementById('np-legenda').value.trim();
+  const midiaUrl = document.getElementById('np-midia-url').value.trim();
+  const capaUrl  = document.getElementById('np-capa-url').value.trim();
+
+  if (!nome || !data) { showToast('Nome e data são obrigatórios.', 'error'); return; }
+  if (!currentClient) { showToast('Selecione um cliente primeiro.', 'error'); return; }
+
+  const postId = crypto.randomUUID();
+  const { error: postErr } = await sb.from('hub_posts').insert({
+    id: postId,
+    cliente_id: currentClient.id,
+    nome, tipo, data_publicacao: data, objetivo,
+    midia_url: midiaUrl, capa_url: capaUrl,
+    status_geral: 'em-revisao',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  });
+
+  if (postErr) { showToast('Erro ao criar post: ' + postErr.message, 'error'); return; }
+
+  // Cria abas
+  const tabs = getTabsForType(tipo);
+  const abasData = tabs.map((t, idx) => ({
+    id: crypto.randomUUID(),
+    post_id: postId,
+    tipo: t,
+    ordem: idx,
+    status: idx === 0 ? 'em-revisao' : 'aguardando',
+    conteudo: t === 'tema' ? tema : t === 'conteudo' ? conteudo : t === 'legenda' ? legenda : '',
+    comentario_cliente: '',
+    contador_alteracoes: 0,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  }));
+
+  const { error: abasErr } = await sb.from('hub_abas').insert(abasData);
+  if (abasErr) { showToast('Post criado mas erro nas abas: ' + abasErr.message, 'error'); return; }
+
+  showToast(`✅ Post "${nome}" criado com sucesso!`, 'success');
+
+  // Limpa formulário
+  ['np-nome','np-tema','np-conteudo','np-legenda','np-midia-url','np-capa-url','np-data'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+
+  await openClientAdm(currentClient.id);
+}
+
+/* ============================================================
+   NOTION — CRIAR TAREFA
+   ============================================================ */
+async function criarTarefaNotion({ nome, tipo, responsavel, prioridade, prazo, cliente, descricao }) {
+  // Armazena localmente (fila) e registra no Supabase
+  // A integração Notion real requer backend — aqui salvamos no hub_tarefas_geradas para rastreamento
+  const { error } = await sb.from('hub_tarefas_geradas').insert({
+    id: crypto.randomUUID(),
+    nome_tarefa: nome,
+    tipo_tarefa: tipo,
+    responsavel,
+    prioridade,
+    prazo,
+    cliente,
+    descricao: descricao || '',
+    status: 'pendente',
+    sincronizado_notion: false,
+    created_at: new Date().toISOString(),
+  });
+
+  if (error) console.error('Erro ao salvar tarefa:', error);
+  // A sincronização com Notion pode ser feita via webhook ou função Edge do Supabase
+}
+
+async function confirmDelete(postId) {
+  if (!confirm('Excluir este post? Esta ação não pode ser desfeita.')) return;
+  await sb.from('hub_abas').delete().eq('post_id', postId);
+  await sb.from('hub_posts').delete().eq('id', postId);
+  showToast('Post excluído.', 'info');
+  await openClientAdm(currentClient.id);
+}
+
+/* ============================================================
+   UTILITÁRIOS
+   ============================================================ */
+function subtractDays(dateStr, days) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr + 'T12:00:00');
+  d.setDate(d.getDate() - days);
+  return d.toISOString().split('T')[0];
+}
+
+function showToast(msg, type = 'info') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 4000);
+}
+
+// Fechar modal clicando fora
+document.getElementById('post-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// Tecla ESC fecha modal
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+</script>
+</body>
+</html>
